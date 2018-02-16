@@ -30,6 +30,9 @@ class QueueNode<T> {
     var value: T
     // but the last node doesn't have a next
     var next: QueueNode<T>? = nil
+    // going to try adding two way link so can remove last element
+    // or you need a pointer to iterate over queue ... but how to implement that?
+    var prior: QueueNode<T>? = nil
     init(value: T) { self.value = value }
 }
 
@@ -46,7 +49,10 @@ extension Queue {
         let oldTail = tail
         self.tail = QueueNode(value: newElement)
         if head == nil { head = tail }
-        else { oldTail?.next = self.tail }
+        else {
+            oldTail?.next = self.tail
+            self.tail?.prior = oldTail
+        }
     }
     func dequeue() -> T? {
         if let head = self.head {
@@ -58,6 +64,33 @@ extension Queue {
             return nil
         }
     }
+    func removeLast(){
+        let valueRemoved = self.tail?.value
+        print(valueRemoved)
+        if self.tail?.prior != nil{
+            self.tail = self.tail?.prior
+        }
+        else{
+            // else if removing the single element in queue
+            dequeue()
+        }
+    }
+
+      // Need ptr iterator to do this
+//    func printQueue(){
+//        if head != nil{
+//            var it: QueueNode<T>? = nil
+//            it = head
+//            while it?.value != nil{
+//                print(head?.value)
+//                it = head?.next
+//            }
+//        }
+//        else{
+//            print("queue is empty - can not print")
+//        }
+//    }
+    
 }
 
 
@@ -70,56 +103,94 @@ class ViewController: UIViewController {
     
     
     var numQueue = Queue<Double>() // append and dequeue
-    var numStack = Stack<Double>(); // push and pop
+    var numStack = Stack<Double>() // push and pop
+    var operatorHitLast = false
     
     @IBAction func num0ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 0)
         print("pushing 0 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "0"
     }
     @IBAction func num1ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 1)
         print("pushing 1 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "1"
     }
     @IBAction func num2ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 2)
         print("pushing 2 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "2"
     }
     @IBAction func num3ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 3)
         print("pushing 3 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "3"
     }
     @IBAction func num4ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 4)
         print("pushing 4 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "4"
     }
     @IBAction func num5ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 5)
         print("pushing 5 to queue")
+        //numQueue.printQueue()
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "5"
     }
     @IBAction func num6ButtonClick(_ sender: Any) {
-        numQueue.append(newElement: 6)
-        print("pushing 6 to queue")
+        if !operatorHitLast{
+            print("operatorHitLast = FALSE")
+            if numQueue.head != nil{
+                print("numQueue.head != NIL")
+                //var headValue = numQueue.head?.value as! Double
+                let headValue = Double((numQueue.tail?.value)!)
+                print("headValue")
+                //numQueue.dequeue()
+                numQueue.removeLast()
+                if headValue > -1.0{
+                    let newValue = headValue * 10 + 6
+                    print("New value pushed to queue = \(newValue)")
+                    numQueue.append(newElement: newValue)
+                    print("Size of queue = \(numQueue.head == nil)")
+                    print("Value of head = \(numQueue.head?.value)")
+                }
+            }
+            else{
+                numQueue.append(newElement: 6)   // single digit
+                print("pushing 6 to queue - SINGLE DIGIT")
+            }
+        }
+        else{
+            print("operatorHitLast = true")  // so just push into queue
+            numQueue.append(newElement: 6)
+        }
+        
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "6"
+        
     }
     @IBAction func num7ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 7)
         print("pushing 7 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "7"
     }
     @IBAction func num8ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 8)
         print("pushing 8 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "8"
     }
     @IBAction func num9ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 9)
         print("pushing 9 to queue")
+        operatorHitLast = false
         opLabel.text = opLabel.text! + "9"
     }
     @IBAction func clearButtonClick(_ sender: Any) {
@@ -146,39 +217,43 @@ class ViewController: UIViewController {
         
         while numQueue.head != nil{
             // Bug - numQueue is never clearing
-            var headValue = numQueue.head?.value as! Double
+            //var headValue = numQueue.head?.value as! Double
+            let headValue = Double(numQueue.dequeue()!)
             print("headValue = \(headValue)")  // or switch to cast Double(...)
             if headValue > -1.0{
                 numStack.push(headValue)
-                numQueue.dequeue()
+                //numQueue.dequeue()   // or just dequeue for headValue?
             }
             else{  // it's an operator
                 op = headValue
-                numQueue.dequeue()
-                operand1 = numStack.pop()
+                //numQueue.dequeue()
                 operand2 = numStack.pop()
+                operand1 = numStack.pop()
+                print("Op: \(op) ; Oper1: \(operand1) ; Oper2: \(operand2)")
                 
                 if op == -1{
-                    numStack.push(operand2 + operand1)
+                    numStack.push(operand1 + operand2)
                 }
                 else if op == -2{
-                    numStack.push(operand2 - operand1)
+                    numStack.push(operand1 - operand2)
                 }
                 else if op == -3{
-                    numStack.push(operand2 * operand1)
+                    numStack.push(operand1 * operand2)
                 }
                 else{
-                    numStack.push(operand2 / operand1)
+                    numStack.push(operand1 / operand2)
                 }
             }
         }
-        var result = String(numStack.pop())
+        let result = String(numStack.pop())
         print("result = \(result)")
         resultText.isHidden = false
         resultLabel.text = result
     }
     @IBAction func additionButtonClick(_ sender: Any) {
         opLabel.text = opLabel.text! + "+"
+        operatorHitLast = true
+        
         if numStack.items.isEmpty{
             numStack.push(-1)
         }
@@ -192,6 +267,8 @@ class ViewController: UIViewController {
     
     @IBAction func subtractionButtonClick(_ sender: Any) {
         opLabel.text = opLabel.text! + "-"
+        operatorHitLast = true
+        
         if numStack.items.isEmpty{
             numStack.push(-2)
         }
