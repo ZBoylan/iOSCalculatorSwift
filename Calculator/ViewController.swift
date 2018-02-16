@@ -66,53 +66,66 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var resultLabel: UILabel!  // will display result after = button hit
     @IBOutlet weak var opLabel: UILabel!      // will display entered operands and operators
+    @IBOutlet weak var resultText: UILabel!   // the "Result =" box
+    
     
     var numQueue = Queue<Double>() // append and dequeue
     var numStack = Stack<Double>(); // push and pop
     
     @IBAction func num0ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 0)
-        
+        print("pushing 0 to queue")
+        opLabel.text = opLabel.text! + "0"
     }
     @IBAction func num1ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 1)
         print("pushing 1 to queue")
+        opLabel.text = opLabel.text! + "1"
     }
     @IBAction func num2ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 2)
         print("pushing 2 to queue")
+        opLabel.text = opLabel.text! + "2"
     }
     @IBAction func num3ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 3)
         print("pushing 3 to queue")
+        opLabel.text = opLabel.text! + "3"
     }
     @IBAction func num4ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 4)
         print("pushing 4 to queue")
+        opLabel.text = opLabel.text! + "4"
     }
     @IBAction func num5ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 5)
         print("pushing 5 to queue")
+        opLabel.text = opLabel.text! + "5"
     }
     @IBAction func num6ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 6)
         print("pushing 6 to queue")
+        opLabel.text = opLabel.text! + "6"
     }
     @IBAction func num7ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 7)
         print("pushing 7 to queue")
+        opLabel.text = opLabel.text! + "7"
     }
     @IBAction func num8ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 8)
         print("pushing 8 to queue")
+        opLabel.text = opLabel.text! + "8"
     }
     @IBAction func num9ButtonClick(_ sender: Any) {
         numQueue.append(newElement: 9)
         print("pushing 9 to queue")
+        opLabel.text = opLabel.text! + "9"
     }
     @IBAction func clearButtonClick(_ sender: Any) {
         resultLabel.text = ""
-        opLabel.text = "0"
+        opLabel.text = ""
+        resultText.isHidden = true
         
         //clear stack and queue
         while numQueue.head != nil{
@@ -161,10 +174,11 @@ class ViewController: UIViewController {
         }
         var result = String(numStack.pop())
         print("result = \(result)")
+        resultText.isHidden = false
         resultLabel.text = result
     }
     @IBAction func additionButtonClick(_ sender: Any) {
-        opLabel.text = "+"
+        opLabel.text = opLabel.text! + "+"
         if numStack.items.isEmpty{
             numStack.push(-1)
         }
@@ -176,9 +190,22 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func subtractionButtonClick(_ sender: Any) {
+        opLabel.text = opLabel.text! + "-"
+        if numStack.items.isEmpty{
+            numStack.push(-2)
+        }
+        else{
+            while !numStack.items.isEmpty{
+                numQueue.append(newElement: numStack.pop())
+            }
+            numStack.push(-2)
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        resultText.isHidden = true
     }
 
     override func didReceiveMemoryWarning() {
