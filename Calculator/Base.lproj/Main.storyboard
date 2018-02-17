@@ -115,6 +115,9 @@
                                 <rect key="frame" x="265" y="210" width="46" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="*"/>
+                                <connections>
+                                    <action selector="multiplicationButtonClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3Ka-0h-XUs"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MRU-Gd-tgb">
                                 <rect key="frame" x="265" y="237" width="46" height="30"/>
@@ -136,6 +139,9 @@
                                 <rect key="frame" x="313" y="210" width="46" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="/"/>
+                                <connections>
+                                    <action selector="divisionButtonClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="srN-yw-y8z"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8jV-pn-sGb">
                                 <rect key="frame" x="313" y="237" width="46" height="30"/>
