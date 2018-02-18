@@ -105,6 +105,11 @@ class ViewController: UIViewController {
     var numQueue = Queue<Double>() // append and dequeue
     var numStack = Stack<Double>() // push and pop
     var operatorHitLast = false
+    var decimalHit = false         // can have 1 or 0 decimals(".") per number
+                                   // reset back to false with each operator, = or clear hit
+    var decimal = 0.1              // .1, then * .1 for each subsequent decimal digit
+                                  // reset back to .1 with each operator, = or clear hit
+                                  // headvalue + (decimal * numberHit)
     
     @IBAction func num0ButtonClick(_ sender: Any) {
         if !operatorHitLast{
@@ -277,22 +282,46 @@ class ViewController: UIViewController {
                 print("headValue")
                 //numQueue.dequeue()
                 numQueue.removeLast()
-                if headValue > -1.0{
-                    let newValue = headValue * 10 + 5
-                    print("New value pushed to queue = \(newValue)")
-                    numQueue.append(newElement: newValue)
-                    print("Size of queue = \(numQueue.head == nil)")
-                    print("Value of head = \(numQueue.head?.value)")
+                if headValue > -1.0{                // Do I need this check? Operator( < 0) would never be in the front of the queue..?
+                    if decimalHit{
+                        let newValue = headValue + (decimal * 5)
+                        numQueue.append(newElement: newValue)
+                        print("New value pushed to queue = \(newValue)")
+                        decimal *= 0.1
+                    }
+                    else{
+                        let newValue = headValue * 10 + 5
+                        print("New value pushed to queue = \(newValue)")
+                        numQueue.append(newElement: newValue)
+                        print("Size of queue = \(numQueue.head == nil)")
+                        print("Value of head = \(numQueue.head?.value)")
+                    }
                 }
             }
             else{
-                numQueue.append(newElement: 5)   // single digit
-                print("pushing 5 to queue - SINGLE DIGIT")
+                if decimalHit{
+                    // a 0.xxx number.    
+                    numQueue.append(newElement: decimal * 5)    // append 0.5
+                    decimal *= 0.1                              // for further decimal digits added
+                }
+                else{
+                    numQueue.append(newElement: 5)   // single digit to start operation (operand1)
+                    print("pushing 5 to queue - SINGLE DIGIT")
+                }
             }
         }
         else{
-            print("operatorHitLast = true")  // so just push into queue
-            numQueue.append(newElement: 5)
+            print("operatorHitLast = true")  // so just push into queue - first digit to next operand
+            //numQueue.append(newElement: 5)
+            if decimalHit{
+                // a 0.xxx number.
+                numQueue.append(newElement: decimal * 5)    // append 0.5
+                decimal *= 0.1                              // for further decimal digits added
+            }
+            else{
+                numQueue.append(newElement: 5)   // single digit to start operation (operand1)
+                print("pushing 5 to queue - SINGLE DIGIT")
+            }
         }
         
         
@@ -427,10 +456,27 @@ class ViewController: UIViewController {
         operatorHitLast = false
         opLabel.text = opLabel.text! + "9"
     }
+    
+    func numberButtonPress(num: Int){
+        // refactor code so each number button pressed calls this
+    }
+    
+    @IBAction func decimalButtonClick(_ sender: Any) {
+        if !decimalHit {  //only 1 "." per operand
+            opLabel.text = opLabel.text! + "."
+            
+            decimalHit = true
+        }
+        // 1 or 0 decimals per number
+        // reset decimalHit back to false after an operator, = or clear is hit??
+    }
+    
     @IBAction func clearButtonClick(_ sender: Any) {
         resultLabel.text = ""
         opLabel.text = ""
         resultText.isHidden = true
+        decimalHit = false
+        decimal = 0.1
         
         //clear stack and queue
         while numQueue.head != nil{
@@ -444,6 +490,9 @@ class ViewController: UIViewController {
         var operand1: Double
         var operand2: Double
         var op: Double
+        
+        decimalHit = false
+        decimal = 0.1
         
         while !numStack.items.isEmpty{
             numQueue.append(newElement: numStack.pop())
@@ -495,6 +544,8 @@ class ViewController: UIViewController {
     @IBAction func additionButtonClick(_ sender: Any) {
         opLabel.text = opLabel.text! + "+"
         operatorHitLast = true
+        decimalHit = false
+        decimal = 0.1
         
         if numStack.items.isEmpty{
             numStack.push(-1)
@@ -510,6 +561,8 @@ class ViewController: UIViewController {
     @IBAction func subtractionButtonClick(_ sender: Any) {
         opLabel.text = opLabel.text! + "-"
         operatorHitLast = true
+        decimalHit = false
+        decimal = 0.1
         
         if numStack.items.isEmpty{
             numStack.push(-2)
@@ -524,6 +577,8 @@ class ViewController: UIViewController {
     @IBAction func multiplicationButtonClick(_ sender: Any) {
         opLabel.text = opLabel.text! + "*"
         operatorHitLast = true
+        decimalHit = false
+        decimal = 0.1
         
         if numStack.items.isEmpty{
             numStack.push(-3)
@@ -541,6 +596,8 @@ class ViewController: UIViewController {
     @IBAction func divisionButtonClick(_ sender: Any) {
         opLabel.text = opLabel.text! + "/"
         operatorHitLast = true
+        decimalHit = false
+        decimal = 0.1
         
         if numStack.items.isEmpty{
             numStack.push(-4)
