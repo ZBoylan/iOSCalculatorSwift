@@ -103,6 +103,8 @@ class ViewController: UIViewController {
     
     var numQueue = Queue<Double>() // append and dequeue
     var numStack = Stack<Double>() // push and pop
+    var negativePressed = false    // These next two for entering in negative numbers
+    var operandStarted = false
     var operatorHitLast = false
     var decimalHit = false         // can have 1 or 0 decimals(".") per number
                                    // reset back to false with each operator, = or clear hit
@@ -111,66 +113,118 @@ class ViewController: UIViewController {
                                   // headvalue + (decimal * numberHit)
     
     @IBAction func num0ButtonClick(_ sender: Any) {
-        
         numberButtonPress(num: 0.0)
     }
     @IBAction func num1ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 1.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -1.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 1.0)
+        }
     }
     @IBAction func num2ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 2.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -2.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 2.0)
+        }
     }
     @IBAction func num3ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 3.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -3.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 3.0)
+        }
     }
     @IBAction func num4ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 4.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -4.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 4.0)
+        }
     }
     @IBAction func num5ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 5.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -5.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 5.0)
+        }
     }
     @IBAction func num6ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 6.0)
+        print("NegativePressed = \(negativePressed)")
+        print("operandStarted = \(operandStarted)")
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -6.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 6.0)
+        }
     }
     @IBAction func num7ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 7.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -7.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 7.0)
+        }
     }
     @IBAction func num8ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 8.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -8.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 8.0)
+        }
     }
     @IBAction func num9ButtonClick(_ sender: Any) {
-        
-        numberButtonPress(num: 9.0)
+        if negativePressed && !operandStarted{
+            numberButtonPress(num: -9.0)
+            operandStarted = true
+        }
+        else{
+            numberButtonPress(num: 9.0)
+        }
     }
     
     func numberButtonPress(num: Double){
-        // refactored code so each number button pressed calls this
+        var newValue: Double
+        
         if !operatorHitLast{
             print("operatorHitLast = FALSE")
             if numQueue.head != nil{
                 print("numQueue.head != NIL")
-                //var headValue = numQueue.head?.value as! Double  // alternate cast method
-                let headValue = Double((numQueue.tail?.value)!)
-                print("headValue")
-                //numQueue.dequeue()
+                let headValue = Double((numQueue.tail?.value)!)  //cast to Double
+                print("headValue = \(headValue)")
                 numQueue.removeLast()
-                if headValue > -1.0{                // Do I need this check? Operator( < 0) would never be in the front of the queue..?
+                if headValue != -1.999999 && headValue != -2.999999 && headValue != -3.999999 && headValue != -4.999999{   // Do I need this check? Operator( < 0) would never be in the front of the queue..?
                     if decimalHit{
-                        let newValue = headValue + (decimal * num)
+                        if headValue < 0{
+                            // -2.3 = -2 - .3
+                            newValue = headValue - (decimal * num)
+                        }
+                        else{
+                            // 4.5 = 4 + .5
+                            newValue = headValue + (decimal * num)
+                        }
                         numQueue.append(newElement: newValue)
-                        print("New value pushed to queue = \(newValue)")
+                        print("decimalHit - New value pushed to queue = \(newValue)")
                         decimal *= 0.1
                     }
                     else{
-                        let newValue = headValue * 10 + num
+                        newValue = headValue * 10 + num
                         print("New value pushed to queue = \(newValue)")
                         numQueue.append(newElement: newValue)
                         print("Size of queue = \(numQueue.head == nil)")
@@ -180,7 +234,6 @@ class ViewController: UIViewController {
             }
             else{
                 if decimalHit{
-                    // a 0.xxx number.
                     numQueue.append(newElement: decimal * num)    // append 0.num
                     decimal *= 0.1                              // for further decimal digits added
                 }
@@ -204,6 +257,7 @@ class ViewController: UIViewController {
         
         operatorHitLast = false
         let numAsString = String(Int(num))
+        print("numAsString = \(numAsString)")
         opLabel.text = opLabel.text! + numAsString
     }
     
@@ -213,6 +267,10 @@ class ViewController: UIViewController {
             decimalHit = true
         }
     }
+    @IBAction func negativeButtonClick(_ sender: Any) {
+        negativePressed = true
+        print("Negative PRESSED")
+    }
     
     @IBAction func clearButtonClick(_ sender: Any) {
         resultLabel.text = ""
@@ -220,6 +278,9 @@ class ViewController: UIViewController {
         resultText.isHidden = true
         decimalHit = false
         decimal = 0.1
+        operandStarted = false
+        negativePressed = false
+        print("     ***CLEAR pressed***")
         
         //clear stack and queue for next operation
         while numQueue.head != nil{
@@ -234,8 +295,10 @@ class ViewController: UIViewController {
         var operand2: Double
         var op: Double
         
-        decimalHit = false
+        decimalHit = false     // These 4 needed here if clearButton always required for next op?
         decimal = 0.1
+        operandStarted = false
+        negativePressed = false
         
         while !numStack.items.isEmpty{
             numQueue.append(newElement: numStack.pop())
@@ -245,24 +308,24 @@ class ViewController: UIViewController {
             //var headValue = numQueue.head?.value as! Double
             let headValue = Double(numQueue.dequeue()!)
             print("headValue = \(headValue)")  // or switch to cast Double(...)
-            if headValue > -1.0{
+            if headValue != -1.999999 && headValue != -2.999999 && headValue != -3.999999 && headValue != -4.999999{
                 numStack.push(headValue)
-                //numQueue.dequeue()   // or just dequeue for headValue?
             }
             else{  // it's an operator
                 op = headValue
-                //numQueue.dequeue()
+                // for future operations with just one operand - will have to evaluate op first
+                //    examples - square root, trig, factorial
                 operand2 = numStack.pop()
                 operand1 = numStack.pop()
                 print("Op: \(op) ; Oper1: \(operand1) ; Oper2: \(operand2)")
                 
-                if op == -1{
+                if op == -1.999999{
                     numStack.push(operand1 + operand2)
                 }
-                else if op == -2{
+                else if op == -2.999999{
                     numStack.push(operand1 - operand2)
                 }
-                else if op == -3{
+                else if op == -3.999999{
                     numStack.push(operand1 * operand2)
                 }
                 else{
@@ -270,7 +333,6 @@ class ViewController: UIViewController {
                 }
             }
         }
-        //var result = Double(numStack.pop())
         var result = ""
         if numStack.topItem?.truncatingRemainder(dividingBy: 1.0) != 0{  // % operator "unavailable here"
             result = String(round(1000*numStack.pop())/1000)  // sets 3 digits of precision - could make the user set # digits of precision
@@ -288,15 +350,17 @@ class ViewController: UIViewController {
         operatorHitLast = true
         decimalHit = false
         decimal = 0.1
+        operandStarted = false
+        negativePressed = false
         
         if numStack.items.isEmpty{
-            numStack.push(-1)
+            numStack.push(-1.999999)
         }
         else{
             while !numStack.items.isEmpty{
                 numQueue.append(newElement: numStack.pop())
             }
-            numStack.push(-1)
+            numStack.push(-1.999999)
         }
     }
     
@@ -305,15 +369,17 @@ class ViewController: UIViewController {
         operatorHitLast = true
         decimalHit = false
         decimal = 0.1
+        operandStarted = false
+        negativePressed = false
         
         if numStack.items.isEmpty{
-            numStack.push(-2)
+            numStack.push(-2.999999)
         }
         else{
             while !numStack.items.isEmpty{
                 numQueue.append(newElement: numStack.pop())
             }
-            numStack.push(-2)
+            numStack.push(-2.999999)
         }
     }
     @IBAction func multiplicationButtonClick(_ sender: Any) {
@@ -321,18 +387,20 @@ class ViewController: UIViewController {
         operatorHitLast = true
         decimalHit = false
         decimal = 0.1
+        operandStarted = false
+        negativePressed = false
         
         if numStack.items.isEmpty{
-            numStack.push(-3)
+            numStack.push(-3.999999)
         }
-        else if numStack.topItem == -4 || numStack.topItem == -3{
-            while numStack.topItem == -4 || numStack.topItem == -3{
+        else if numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
+            while numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
                 numQueue.append(newElement: numStack.pop())
             }
-            numStack.push(-3)
+            numStack.push(-3.999999)
         }
         else{
-            numStack.push(-3)
+            numStack.push(-3.999999)
         }
     }
     @IBAction func divisionButtonClick(_ sender: Any) {
@@ -340,18 +408,20 @@ class ViewController: UIViewController {
         operatorHitLast = true
         decimalHit = false
         decimal = 0.1
+        operandStarted = false
+        negativePressed = false
         
         if numStack.items.isEmpty{
-            numStack.push(-4)
+            numStack.push(-4.999999)
         }
-        else if numStack.topItem == -4 || numStack.topItem == -3{
-            while numStack.topItem == -4 || numStack.topItem == -3{
+        else if numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
+            while numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
                 numQueue.append(newElement: numStack.pop())
             }
-            numStack.push(-4)
+            numStack.push(-4.999999)
         }
         else{
-            numStack.push(-4)
+            numStack.push(-4.999999)
         }
     }
     
