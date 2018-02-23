@@ -113,94 +113,45 @@ class ViewController: UIViewController {
                                   // headvalue + (decimal * numberHit)
     
     @IBAction func num0ButtonClick(_ sender: Any) {
-        numberButtonPress(num: 0.0)
+        numberButtonPress(number: 0.0)
     }
     @IBAction func num1ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -1.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 1.0)
-        }
+        numberButtonPress(number: 1.0)
     }
     @IBAction func num2ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -2.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 2.0)
-        }
+        numberButtonPress(number: 2.0)
     }
     @IBAction func num3ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -3.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 3.0)
-        }
+        numberButtonPress(number: 3.0)
     }
     @IBAction func num4ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -4.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 4.0)
-        }
+        numberButtonPress(number: 4.0)
     }
     @IBAction func num5ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -5.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 5.0)
-        }
+        numberButtonPress(number: 5.0)
     }
     @IBAction func num6ButtonClick(_ sender: Any) {
-        print("NegativePressed = \(negativePressed)")
-        print("operandStarted = \(operandStarted)")
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -6.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 6.0)
-        }
+        numberButtonPress(number: 6.0)
     }
     @IBAction func num7ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -7.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 7.0)
-        }
+        numberButtonPress(number: 7.0)
     }
     @IBAction func num8ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -8.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 8.0)
-        }
+        numberButtonPress(number: 8.0)
     }
     @IBAction func num9ButtonClick(_ sender: Any) {
-        if negativePressed && !operandStarted{
-            numberButtonPress(num: -9.0)
-            operandStarted = true
-        }
-        else{
-            numberButtonPress(num: 9.0)
-        }
+        numberButtonPress(number: 9.0)
     }
     
-    func numberButtonPress(num: Double){
+    func numberButtonPress(number: Double){
         var newValue: Double
+        var num = number         //func arguments set to 'let' by default and passing literal
+        
+        // to check if negative number passed
+        if negativePressed && !operandStarted{
+            num *= -1
+            operandStarted = true
+        }
         
         if !operatorHitLast{
             print("operatorHitLast = FALSE")
