@@ -101,11 +101,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var opLabel: UILabel!      // will display entered operands and operators
     @IBOutlet weak var resultText: UILabel!   // the "Result =" box
     
+    // Data storage - one queue and stack
     var numQueue = Queue<Double>() // append and dequeue
     var numStack = Stack<Double>() // push and pop
-    var negativePressed = false    // These next two for entering in negative numbers
-    var operandStarted = false
-    var operatorHitLast = false
+    
+    var negativePressed =   false    // These next two for entering in negative numbers
+    var operandStarted =    false    // See ^
+    var operatorHitLast =   false    // These next two for error prevention
+    var atLeastOneOperand = false
+    var equalsHitLast =     false    // to restore opLabel after = button hit back to ""
     var decimalHit = false         // can have 1 or 0 decimals(".") per number
                                    // reset back to false with each operator, = or clear hit
     var decimal = 0.1              // .1, then * .1 for each subsequent decimal digit
@@ -153,6 +157,14 @@ class ViewController: UIViewController {
             operandStarted = true
         }
         
+        // check if we need to reset the opLabel back to ""
+        if equalsHitLast{
+            print("  **opLabel RESET")
+            resultLabel.text = ""
+            opLabel.text = ""
+            resultText.isHidden = true
+        }
+        
         if !operatorHitLast && numQueue.head != nil{
             print("operatorHitLast = FALSE and numQueue.head != NIL")
                 let tailValue = Double((numQueue.tail?.value)!)  //cast to Double
@@ -194,6 +206,8 @@ class ViewController: UIViewController {
         }
         
         operatorHitLast = false
+        atLeastOneOperand = true
+        equalsHitLast = false
         let numAsString = String(Int(abs(num)))     // get absolute value so doesnt print .-9
         print("numAsString = \(numAsString)")
         opLabel.text = opLabel.text! + numAsString
@@ -221,6 +235,7 @@ class ViewController: UIViewController {
         decimal = 0.1
         operandStarted = false
         negativePressed = false
+        atLeastOneOperand = false
         print("     ***CLEAR pressed***")
         
         //clear stack and queue for next operation
@@ -231,140 +246,150 @@ class ViewController: UIViewController {
             numStack.pop()
         }
     }
+    
     @IBAction func equalsButtonClick(_ sender: Any) {
-        var operand1: Double
-        var operand2: Double
-        var op: Double
-        
-        decimalHit = false     // These 4 needed here if clearButton always required for next op?
-        decimal = 0.1
-        operandStarted = false
-        negativePressed = false
-        
-        while !numStack.items.isEmpty{
-            numQueue.append(newElement: numStack.pop())
-        }
-        
-        while numQueue.head != nil{
-            //var headValue = numQueue.head?.value as! Double
-            let headValue = Double(numQueue.dequeue()!)
-            print("headValue = \(headValue)")  // or switch to cast Double(...)
-            if headValue != -1.999999 && headValue != -2.999999 && headValue != -3.999999 && headValue != -4.999999{
-                numStack.push(headValue)
-            }
-            else{  // it's an operator
-                op = headValue
-                // for future operations with just one operand - will have to evaluate op first
-                //    examples - square root, trig, factorial
-                operand2 = numStack.pop()
-                operand1 = numStack.pop()
-                print("Op: \(op) ; Oper1: \(operand1) ; Oper2: \(operand2)")
-                
-                if op == -1.999999{
-                    numStack.push(operand1 + operand2)
-                }
-                else if op == -2.999999{
-                    numStack.push(operand1 - operand2)
-                }
-                else if op == -3.999999{
-                    numStack.push(operand1 * operand2)
-                }
-                else{
-                    numStack.push(operand1 / operand2)
-                }
-            }
-        }
-        var result = ""
-        if numStack.topItem?.truncatingRemainder(dividingBy: 1.0) != 0{  // % operator "unavailable here"
-            result = String(round(1000*numStack.pop())/1000)  // sets 3 digits of precision - could make the user set # digits of precision
-        }
-        else{  // result is an integer - don't display the ".0"
-            result = String(Int(numStack.pop()))
-        }
-        
-        print("result = \(result)")
-        resultText.isHidden = false
-        resultLabel.text = result
-    }
-    @IBAction func additionButtonClick(_ sender: Any) {
-        opLabel.text = opLabel.text! + " + "
-        operatorHitLast = true
-        decimalHit = false
-        decimal = 0.1
-        operandStarted = false
-        negativePressed = false
-        
-        if numStack.items.isEmpty{
-            numStack.push(-1.999999)
-        }
-        else{
+        // to avoid input error -> ex. 4+=   or   just =
+        if !operatorHitLast && numQueue.head != nil{
+            var operand1: Double
+            var operand2: Double
+            var op: Double
+            
+            decimalHit = false     // These 4 needed here if clearButton always required for next op?
+            decimal = 0.1
+            operandStarted = false
+            negativePressed = false
+            atLeastOneOperand = false
+            equalsHitLast = true
+            
             while !numStack.items.isEmpty{
                 numQueue.append(newElement: numStack.pop())
             }
-            numStack.push(-1.999999)
+            
+            while numQueue.head != nil{
+                //var headValue = numQueue.head?.value as! Double
+                let headValue = Double(numQueue.dequeue()!)
+                print("headValue = \(headValue)")  // or switch to cast Double(...)
+                if headValue != -1.999999 && headValue != -2.999999 && headValue != -3.999999 && headValue != -4.999999{
+                    numStack.push(headValue)
+                }
+                else{  // it's an operator
+                    op = headValue
+                    // for future operations with just one operand - will have to evaluate op first
+                    //    examples - square root, trig, factorial
+                    operand2 = numStack.pop()
+                    operand1 = numStack.pop()
+                    print("Op: \(op) ; Oper1: \(operand1) ; Oper2: \(operand2)")
+                    
+                    if op == -1.999999{
+                        numStack.push(operand1 + operand2)
+                    }
+                    else if op == -2.999999{
+                        numStack.push(operand1 - operand2)
+                    }
+                    else if op == -3.999999{
+                        numStack.push(operand1 * operand2)
+                    }
+                    else{
+                        numStack.push(operand1 / operand2)
+                    }
+                }
+            }
+            var result = ""
+            if numStack.topItem?.truncatingRemainder(dividingBy: 1.0) != 0{  // % operator "unavailable here"
+                result = String(round(1000*numStack.pop())/1000)  // sets 3 digits of precision - could make the user set # digits of precision
+            }
+            else{  // result is an integer - don't display the ".0"
+                result = String(Int(numStack.pop()))
+            }
+            
+            print("result = \(result)")
+            resultText.isHidden = false
+            resultLabel.text = result
+            // carry result value over to next op or always clear it?
         }
     }
     
+    @IBAction func additionButtonClick(_ sender: Any) {
+        if !operatorHitLast && atLeastOneOperand{  // to prevent error/crash
+            addSubtract(num: -1.999999)
+        }
+        // if equalsHitLast
+        // put result value into queue then call addSubtract..?
+    }
+    
     @IBAction func subtractionButtonClick(_ sender: Any) {
-        opLabel.text = opLabel.text! + " - "
+        if !operatorHitLast && atLeastOneOperand{
+            addSubtract(num: -2.999999)
+        }
+    }
+    
+    func addSubtract(num: Double){
+        print("addSubtract() called")
         operatorHitLast = true
         decimalHit = false
         decimal = 0.1
         operandStarted = false
         negativePressed = false
         
+        if num == -1.999999{
+            opLabel.text = opLabel.text! + " + "
+        }
+        else{
+            opLabel.text = opLabel.text! + " - "
+        }
+        
         if numStack.items.isEmpty{
-            numStack.push(-2.999999)
+            numStack.push(num)
         }
         else{
             while !numStack.items.isEmpty{
                 numQueue.append(newElement: numStack.pop())
             }
-            numStack.push(-2.999999)
+            numStack.push(num)
         }
     }
     @IBAction func multiplicationButtonClick(_ sender: Any) {
-        opLabel.text = opLabel.text! + " * "
-        operatorHitLast = true
-        decimalHit = false
-        decimal = 0.1
-        operandStarted = false
-        negativePressed = false
-        
-        if numStack.items.isEmpty{
-            numStack.push(-3.999999)
-        }
-        else if numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
-            while numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
-                numQueue.append(newElement: numStack.pop())
-            }
-            numStack.push(-3.999999)
-        }
-        else{
-            numStack.push(-3.999999)
+        if !operatorHitLast && atLeastOneOperand{
+            multiplyDivide(num: -3.999999)
         }
     }
     @IBAction func divisionButtonClick(_ sender: Any) {
-        opLabel.text = opLabel.text! + " / "
+        if !operatorHitLast && atLeastOneOperand{
+            multiplyDivide(num: -4.999999)
+        }
+    }
+    
+    func multiplyDivide(num: Double){
+        print("multiplyDivide() called")
         operatorHitLast = true
         decimalHit = false
         decimal = 0.1
         operandStarted = false
         negativePressed = false
         
+        if num == -3.999999{
+            opLabel.text = opLabel.text! + " * "
+        }
+        else{
+            opLabel.text = opLabel.text! + " / "
+        }
+        
         if numStack.items.isEmpty{
-            numStack.push(-4.999999)
+            numStack.push(num)
         }
         else if numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
             while numStack.topItem == -4.999999 || numStack.topItem == -3.999999{
                 numQueue.append(newElement: numStack.pop())
             }
-            numStack.push(-4.999999)
+            numStack.push(num)
         }
         else{
-            numStack.push(-4.999999)
+            numStack.push(num)
         }
     }
+    
+    // future operators: (), exponent,
+    //     unary: square root, factorial, trig(?)
     
     override func viewDidLoad() {
         super.viewDidLoad()
