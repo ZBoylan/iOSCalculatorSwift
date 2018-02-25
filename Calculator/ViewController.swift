@@ -105,6 +105,7 @@ class ViewController: UIViewController {
     var numQueue = Queue<Double>() // append and dequeue
     var numStack = Stack<Double>() // push and pop
     
+    var resultValue = 0.0
     var negativePressed =   false    // These next two for entering in negative numbers
     var operandStarted =    false    // See ^
     var operatorHitLast =   false    // These next two for error prevention
@@ -236,6 +237,7 @@ class ViewController: UIViewController {
         operandStarted = false
         negativePressed = false
         atLeastOneOperand = false
+        //equalsHitLast = false   //comment out to retain old resultValue even after hitting clear
         print("     ***CLEAR pressed***")
         
         //clear stack and queue for next operation
@@ -296,10 +298,13 @@ class ViewController: UIViewController {
             }
             var result = ""
             if numStack.topItem?.truncatingRemainder(dividingBy: 1.0) != 0{  // % operator "unavailable here"
-                result = String(round(1000*numStack.pop())/1000)  // sets 3 digits of precision - could make the user set # digits of precision
+                print(" Decimal value will be printed - \(numStack.topItem)")
+                resultValue = round(1000 * numStack.pop()) / 1000
+                result = String(resultValue)  // sets 3 digits of precision - could make the user set # digits of precision
             }
             else{  // result is an integer - don't display the ".0"
-                result = String(Int(numStack.pop()))
+                resultValue = numStack.pop()
+                result = String(Int(resultValue))
             }
             
             print("result = \(result)")
@@ -313,12 +318,18 @@ class ViewController: UIViewController {
         if !operatorHitLast && atLeastOneOperand{  // to prevent error/crash
             addSubtract(num: -1.999999)
         }
-        // if equalsHitLast
-        // put result value into queue then call addSubtract..?
+        else if equalsHitLast{
+            carryResult()
+            addSubtract(num: -1.999999)
+        }
     }
     
     @IBAction func subtractionButtonClick(_ sender: Any) {
         if !operatorHitLast && atLeastOneOperand{
+            addSubtract(num: -2.999999)
+        }
+        else if equalsHitLast{
+            carryResult()
             addSubtract(num: -2.999999)
         }
     }
@@ -330,6 +341,7 @@ class ViewController: UIViewController {
         decimal = 0.1
         operandStarted = false
         negativePressed = false
+        equalsHitLast = false
         
         if num == -1.999999{
             opLabel.text = opLabel.text! + " + "
@@ -348,13 +360,22 @@ class ViewController: UIViewController {
             numStack.push(num)
         }
     }
+    
     @IBAction func multiplicationButtonClick(_ sender: Any) {
         if !operatorHitLast && atLeastOneOperand{
+            multiplyDivide(num: -3.999999)
+        }
+        else if equalsHitLast{
+            carryResult()
             multiplyDivide(num: -3.999999)
         }
     }
     @IBAction func divisionButtonClick(_ sender: Any) {
         if !operatorHitLast && atLeastOneOperand{
+            multiplyDivide(num: -4.999999)
+        }
+        else if equalsHitLast{
+            carryResult()
             multiplyDivide(num: -4.999999)
         }
     }
@@ -366,6 +387,7 @@ class ViewController: UIViewController {
         decimal = 0.1
         operandStarted = false
         negativePressed = false
+        equalsHitLast = false
         
         if num == -3.999999{
             opLabel.text = opLabel.text! + " * "
@@ -386,6 +408,18 @@ class ViewController: UIViewController {
         else{
             numStack.push(num)
         }
+    }
+    
+    func carryResult(){
+        numQueue.append(newElement: resultValue)
+        if resultValue.truncatingRemainder(dividingBy: 1.0) != 0 {
+            opLabel.text = "\(resultValue)"
+        }
+        else{
+            opLabel.text = "\(Int(resultValue))"
+        }
+        resultLabel.text = ""
+        resultText.isHidden = true
     }
     
     // future operators: (), exponent,
