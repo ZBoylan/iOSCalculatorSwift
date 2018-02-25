@@ -148,54 +148,41 @@ class ViewController: UIViewController {
         var num = number         //func arguments set to 'let' by default and passing literal
         
         // to check if negative number passed
-        if negativePressed && !operandStarted{
+        if negativePressed && !operandStarted && num != 0{
             num *= -1
             operandStarted = true
         }
         
-        if !operatorHitLast{
-            print("operatorHitLast = FALSE")
-            if numQueue.head != nil{
-                print("numQueue.head != NIL")
-                let headValue = Double((numQueue.tail?.value)!)  //cast to Double
-                print("headValue = \(headValue)")
+        if !operatorHitLast && numQueue.head != nil{
+            print("operatorHitLast = FALSE and numQueue.head != NIL")
+                let tailValue = Double((numQueue.tail?.value)!)  //cast to Double
+                print("headValue = \(tailValue)")
                 numQueue.removeLast()
-                if headValue != -1.999999 && headValue != -2.999999 && headValue != -3.999999 && headValue != -4.999999{   // Do I need this check? Operator( < 0) would never be in the front of the queue..?
+                if tailValue != -1.999999 && tailValue != -2.999999 && tailValue != -3.999999 && tailValue != -4.999999{   // Do I need this check? Operator( < 0) would never be in the front of the queue..?
                     if decimalHit{
-                        if headValue < 0{
+                        if tailValue < 0{
                             // -2.3 = -2 - .3
-                            newValue = headValue - (decimal * num)
+                            newValue = tailValue - (decimal * num)
                         }
                         else{
                             // 4.5 = 4 + .5
-                            newValue = headValue + (decimal * num)
+                            newValue = tailValue + (decimal * num)
                         }
                         numQueue.append(newElement: newValue)
                         print("decimalHit - New value pushed to queue = \(newValue)")
                         decimal *= 0.1
                     }
                     else{
-                        newValue = headValue * 10 + num
+                        newValue = tailValue * 10 + num
                         print("New value pushed to queue = \(newValue)")
                         numQueue.append(newElement: newValue)
                         print("Size of queue = \(numQueue.head == nil)")
                         print("Value of head = \(numQueue.head?.value)")
                     }
                 }
-            }
-            else{
-                if decimalHit{
-                    numQueue.append(newElement: decimal * num)    // append 0.num
-                    decimal *= 0.1                              // for further decimal digits added
-                }
-                else{
-                    numQueue.append(newElement: num)   //single digit to start operation (operand1)
-                    print("pushing \(num) to queue - SINGLE DIGIT")
-                }
-            }
         }
         else{
-            print("operatorHitLast = true")  // just push into queue - first digit to next operand
+            print("operatorHitLast = true or numQueue.head == NIL")  // just push into queue - first digit to next operand
             if decimalHit{
                 numQueue.append(newElement: decimal * num)    // append 0.num
                 decimal *= 0.1                              // for further decimal digits added
@@ -207,7 +194,7 @@ class ViewController: UIViewController {
         }
         
         operatorHitLast = false
-        let numAsString = String(Int(num))
+        let numAsString = String(Int(abs(num)))     // get absolute value so doesnt print .-9
         print("numAsString = \(numAsString)")
         opLabel.text = opLabel.text! + numAsString
     }
@@ -219,8 +206,11 @@ class ViewController: UIViewController {
         }
     }
     @IBAction func negativeButtonClick(_ sender: Any) {
-        negativePressed = true
-        print("Negative PRESSED")
+        if !negativePressed{
+            negativePressed = true
+            opLabel.text = opLabel.text! + "-"    // only show 0 or 1 negative signs per operand
+            print("Negative PRESSED")
+        }
     }
     
     @IBAction func clearButtonClick(_ sender: Any) {
