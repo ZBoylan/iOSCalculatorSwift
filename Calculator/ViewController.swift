@@ -105,6 +105,14 @@ class ViewController: UIViewController {
     var numQueue = Queue<Double>() // append and dequeue
     var numStack = Stack<Double>() // push and pop
     
+    /*
+     Operators have the following values:
+      Addition:       -1.999999
+      Subtraction:    -2.999999
+      Multiplication: -3.999999
+      Division:       -4.999999
+    */
+    
     var resultValue = 0.0
     var negativePressed =   false    // These next two for entering in negative numbers
     var operandStarted =    false    // See ^
@@ -155,12 +163,13 @@ class ViewController: UIViewController {
         // to check if negative number passed
         if negativePressed && !operandStarted && num != 0{
             num *= -1
+            print("Negative pressed - num = \(num)")
             operandStarted = true
         }
         
         // check if we need to reset the opLabel back to ""
         if equalsHitLast{
-            print("  **opLabel RESET")
+            print("  **opLabel RESET - line 164")
             resultLabel.text = ""
             opLabel.text = ""
             resultText.isHidden = true
@@ -186,7 +195,14 @@ class ViewController: UIViewController {
                         decimal *= 0.1
                     }
                     else{
-                        newValue = tailValue * 10 + num
+                        if tailValue < 0{
+                            // -29 = -20 - 9
+                            newValue = tailValue * 10 - num
+                        }
+                        else{
+                            // 56 = 50 + 6
+                            newValue = tailValue * 10 + num
+                        }
                         print("New value pushed to queue = \(newValue)")
                         numQueue.append(newElement: newValue)
                         print("Size of queue = \(numQueue.head == nil)")
@@ -215,12 +231,26 @@ class ViewController: UIViewController {
     }
     
     @IBAction func decimalButtonClick(_ sender: Any) {
+        if equalsHitLast{
+            print("  **opLabel RESET - line 227")
+            resultLabel.text = ""
+            opLabel.text = ""
+            resultText.isHidden = true
+            equalsHitLast = false
+        }
         if !decimalHit {  //only 0 or 1 "." per operand
             opLabel.text = opLabel.text! + "."
             decimalHit = true
         }
     }
     @IBAction func negativeButtonClick(_ sender: Any) {
+        if equalsHitLast{
+            print("  **opLabel RESET - line 240")
+            resultLabel.text = ""
+            opLabel.text = ""
+            resultText.isHidden = true
+            equalsHitLast = false
+        }
         if !negativePressed{
             negativePressed = true
             opLabel.text = opLabel.text! + "-"    // only show 0 or 1 negative signs per operand
